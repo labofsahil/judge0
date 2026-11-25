@@ -1,4 +1,4 @@
-require 'database_cleaner'
+require 'database_cleaner/active_record'
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = false
@@ -13,6 +13,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.start
+    Rails.cache.clear if Rails.cache.respond_to?(:clear)
   end
 
   config.after(:each) do

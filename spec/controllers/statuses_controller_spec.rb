@@ -5,7 +5,7 @@ RSpec.describe StatusesController, type: :controller do
     it "returns all statuses" do
       get :index
       json = JSON.parse(response.body)
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json).to have_serialized(Status.all).with(StatusSerializer)
     end
   end

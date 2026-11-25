@@ -1,24 +1,16 @@
 class HealthController < ApplicationController
   def workers
-    Resque.workers.first.try(:prune_dead_workers) if params[:prune_dead_workers] == "true"
-
-    queues = Hash.new { |h, k| h[k] = [] }
-    Resque.workers.each do |worker|
-      worker.queues.each do |queue|
-        queues[queue] << worker
-      end
-    end
-
     json = []
-    Resque.queues.each do |queue|
-      workers = queues[queue]
+    process_set = Sidekiq::ProcessSet.new
+    Sidekiq::Queue.all.each do |queue|
+      busy = process_set.count { |p| p.queues.include?(queue.name) }
       json << {
-        queue: queue,
-        size: Resque.size(queue),
-        available: workers.count,
-        idle: workers.count { |w| w.idle? },
-        working: workers.count { |w| w.working? },
-        paused: workers.count { |w| w.paused? }
+        queue: queue.name,
+        size: queue.size,
+        available: busy,
+        idle: process_set.count { |p| p.queues.include?(queue.name) && !p.busy? },
+        working: process_set.count(&:busy?),
+        paused: process_set.count(&:stopped?)
       }
     end
 

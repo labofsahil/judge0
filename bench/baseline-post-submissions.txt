@@ -1,0 +1,6 @@
+     50%   67.40ms
+     75%  703.05ms
+     90%    1.18s 
+     99%    1.78s 
+  Socket errors: connect 0, read 0, write 0, timeout 3
+Requests/sec:     80.93

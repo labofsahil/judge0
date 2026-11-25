@@ -20,7 +20,7 @@ module Judge0API
       g.factory_girl test_framework: :rspec
     end
 
-    config.active_job.queue_adapter = :resque
+    config.active_job.queue_adapter = :sidekiq
 
     config.middleware.insert_before 0, Rack::Cors do
       origins = []

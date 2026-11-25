@@ -12,6 +12,9 @@ LABEL maintainer=$JUDGE0_MAINTAINER
 ENV PATH "/usr/local/ruby-2.7.0/bin:/opt/.gem/bin:$PATH"
 ENV GEM_HOME "/opt/.gem/"
 
+# Enable YJIT when the Ruby runtime supports it (Ruby >= 3.1 built with YJIT).
+ENV RUBY_YJIT_ENABLE "1"
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       cron \
