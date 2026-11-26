@@ -45,6 +45,7 @@ Rails.application.configure do
   # across puma workers and survive restarts.
   config.cache_store = :redis_cache_store, {
     url: "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:#{ENV.fetch('REDIS_PORT', 6379)}/1",
+    password: ENV["REDIS_PASSWORD"].presence,
     expires_in: 90.minutes
   }
 

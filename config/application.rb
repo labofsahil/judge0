@@ -22,6 +22,23 @@ module Judge0API
 
     config.active_job.queue_adapter = :sidekiq
 
+    # Deployment runbook (Resque -> Sidekiq cutover):
+    # 1. Before deploying, stop new submissions (brief maintenance or drain
+    #    window) and let Resque finish its queues:
+    #      resque-web   # confirm depth
+    #      # workers exit on their own when queues are empty; verify:
+    #      redis-cli keys "queue:*"        # only empty list keys should remain
+    # 2. If any payloads remain (failed/retry queues), migrate them:
+    #      # each Resque payload is an ActiveJob-compatible JSON hash with
+    #      # "job_class", "arguments" and "queue" keys; re-enqueue with:
+    #      redis-cli lrange "queue:default" 0 -1   # inspect first
+    #      # then for each payload r, push it to the Sidekiq queue as Sidekiq
+    #      # accepts the same ActiveJob hash:
+    #      redis-cli lpush "queue:default" "$r"
+    # 3. Deploy this build, then start workers: ./scripts/workers
+    # 4. Verify: GET /workers shows subscribed processes and a shrinking
+    #    queue size; delete leftover "queue:*" keys once drained.
+
     config.middleware.insert_before 0, Rack::Cors do
       origins = []
 

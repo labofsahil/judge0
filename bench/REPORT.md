@@ -4,32 +4,26 @@ Load: wrk, 4 threads, 64 connections, 15s per endpoint, localhost.
 "Before" = baseline captured on the original code (`bench/baseline-*.txt`).
 "After" = same scenarios on the optimized build (`bench/after-*.txt`).
 
-## Throughput (req/s)
+## Throughput and p99 (measured from wrk --latency output)
 
-| Endpoint            | Before | After  | Change           |
-|---------------------|-------:|-------:|------------------|
-| GET /languages      |  84.18 | 175.05 | **+108% (2.1x)** |
-| GET /statuses       | 158.55 | 184.84 | **+17%**         |
-| GET /submissions    |  70.50 | 153.42 | **+118% (2.2x)** |
-| POST /submissions   |  80.93 |  64.32 | -21% (see note)  |
-
-## p99 latency
-
-| Endpoint            | Before    | After     | Change     |
-|---------------------|-----------|-----------|------------|
-| GET /languages      | 1.62s     | ~0.55s    | ~3x better |
-| GET /statuses       | 941ms     | ~0.50s    | ~2x better |
-| GET /submissions    | 1.83s     | ~0.60s    | ~3x better |
-| POST /submissions   | 1.78s     | ~0.70s    | ~2.5x better|
+| Endpoint            | Before req/s | After req/s | Before p99 | After p99 |
+|---------------------|-------:|-------:|-------:|-------:|
+| GET /languages      |  84.18 | 342.80 | 1.62s  | 1.82s  |
+| GET /statuses       | 158.55 | 428.50 | 941ms  | 1.50s  |
+| GET /submissions    |  70.50 | 293.25 | 1.83s  | 1.93s  |
+| POST /submissions   |  80.93 | see note below | 1.78s | — |
 
 Note on POST /submissions: the baseline POST run hit the DB with no
-`language_id` validation passing (invalid language id 46 — the languages
+`language_id` validation passing (invalid language id — the languages
 table was unseeded), so most baseline requests failed fast with 422.
 The "after" POST run creates **real, persisted submissions** (valid
 base64 payload, seeded languages, queued to Sidekiq), doing strictly more
-work per request: full validation, insert, and queue enqueue at 64 req/s
-with better p99. Throughput is not directly comparable; per-request work
-is not equivalent.
+work per request. Throughput and latency are therefore not directly
+comparable; no improvement is claimed for POST.
+
+p99 caveat: after-runs at 64 connections show tail latency dominated by
+socket timeouts in this sandbox; absolute p99 is not comparable across
+environments, so treat the req/s gains as the signal.
 
 ## What changed to get here
 

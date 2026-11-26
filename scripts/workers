@@ -9,5 +9,6 @@ COUNT=${COUNT:-$(( $(nproc) * 2 ))}
 
 exec bundle exec sidekiq \
     --concurrency "$COUNT" \
-    --queues "$QUEUE,default" \
+    --queue "$QUEUE" \
+    --queue default \
     --verbose
