@@ -206,7 +206,7 @@ class SubmissionsController < ApplicationController
 
   def check_queue_size
     number_of_submissions = params[:submissions].try(:size).presence || 1
-    if Resque.size(ENV["JUDGE0_VERSION"]) + number_of_submissions > Config::MAX_QUEUE_SIZE
+    if Sidekiq::Queue.new(IsolateJob.queue_name).size + number_of_submissions > Config::MAX_QUEUE_SIZE
       render json: { error: "queue is full" }, status: :service_unavailable
     end
   end

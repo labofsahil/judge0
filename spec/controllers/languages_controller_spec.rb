@@ -6,8 +6,8 @@ RSpec.describe LanguagesController, type: :controller do
       create_list(:language, 10)
       get :index
       json = JSON.parse(response.body)
-      expect(response).to be_success
-      expect(json).to have_serialized(Language.all).with(LanguageSerializer)
+      expect(response).to be_successful
+      expect(json).to eq(Language.order(:id).map { |l| { "id" => l.id, "name" => l.name } })
     end
   end
 end

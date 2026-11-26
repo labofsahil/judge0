@@ -8,8 +8,17 @@ RSpec.describe SubmissionsController, type: :controller do
     it "returns one submission" do
       get :show, params: { token: submission.token }
       json = JSON.parse(response.body)
-      expect(response).to be_success
-      expect(json).to have_serialized(submission).with(SubmissionSerializer)
+      expect(response).to be_successful
+      expect(json).to eq(
+        "stdout" => "aGVsbG8sIHdvcmxk\n",
+        "time" => "1.0",
+        "memory" => 256,
+        "stderr" => nil,
+        "token" => submission.token,
+        "compile_output" => nil,
+        "message" => nil,
+        "status" => { "id" => 1, "description" => "In Queue" }
+      )
     end
 
     it "returns 404" do
@@ -30,7 +39,7 @@ RSpec.describe SubmissionsController, type: :controller do
       it "returns only id of new Submission" do
         post :create, params: attributes_for(:valid_submission)
         json = JSON.parse(response.body)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(json).to have_serialized(Submission.first).with(SubmissionSerializer, { fields: [:token] })
       end
 

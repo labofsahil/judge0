@@ -1,0 +1,14 @@
+Running 15s test @ http://127.0.0.1:3000/languages
+  4 threads and 64 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   459.90ms  566.03ms   2.00s    78.90%
+    Req/Sec    97.85     58.20   420.00     77.03%
+  Latency Distribution
+     50%   31.93ms
+     75%  887.55ms
+     90%    1.41s 
+     99%    1.82s 
+  5153 requests in 15.03s, 2.48MB read
+  Socket errors: connect 0, read 0, write 0, timeout 5
+Requests/sec:    342.80
+Transfer/sec:    169.02KB
